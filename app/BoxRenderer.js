@@ -11,7 +11,9 @@ function ParentComponent() {
   const [boxArray, setBoxArray] = useState([]);
 
   // Perform API call to fetch the initial graph data
-  useEffect(() => {
+  useEffect(() => { fetchBlankGraph(); }, []); // Empty dependency array to ensure the effect runs only once
+
+  function fetchBlankGraph() {
     const fetchGraph = async () => {
       const response = await fetch("/api/graph");
       const graph = await response.json();
@@ -24,9 +26,10 @@ function ParentComponent() {
       
       setBoxArray(orderBoxes(initialBoxArray, rows, columns));
     };
-    
+
     fetchGraph();
-  }, []); // Empty dependency array to ensure the effect runs only once
+  };
+
 
   const setBoxState = (boxId, newState) => {
     // Check if there's already a start or end box
@@ -60,11 +63,36 @@ function ParentComponent() {
   };
   
   function showPath(boxArray, path) {
-    const updatedBoxArray = boxArray.map((box) =>
-      path.includes(box.id) ? { ...box, state: "show_path" } : box
-    );
+    const updatedBoxArray = boxArray.map((box) => {
+      if (path.includes(box.id) && box.state !== "start" && box.state !== "end") {
+        return { ...box, state: "show_path" };
+      }
+      return box;
+    });
     setBoxArray(updatedBoxArray);
+  }  
+
+  function generateRandomWalls(totalCount, wallPercentage) {
+    const wallCount = Math.floor((wallPercentage / 100) * totalCount); // Calculate the number of walls based on the percentage
+    const wallIndices = [];
+  
+    // Generate random unique indices for walls
+    while (wallIndices.length < wallCount) {
+      const randomIndex = Math.floor(Math.random() * totalCount);
+      if (!wallIndices.includes(randomIndex)) {
+        wallIndices.push(randomIndex);
+      }
+    }
+  
+    // Create an array representing your objects with walls
+    const objectsWithWalls = boxArray.map((box, index) => ({
+      ...box,
+      state: wallIndices.includes(index) ? "wall" : "path"
+    }));
+  
+    setBoxArray(objectsWithWalls);
   }
+  
 
   function orderBoxes(boxArray, rows, columns) {
     const orderedBoxes = [];
@@ -91,7 +119,9 @@ function ParentComponent() {
           />
         ))}
       </div>
-      <button onClick={handleFunction}>Perform Function</button>
+      <button onClick={handleFunction}>Dijkstra's Algorithm</button>
+      <button onClick={fetchBlankGraph}>Reset</button>
+      <button onClick={() => generateRandomWalls(rows * columns, 30)}> Generate Random Walls </button>
     </div>
   );
 }
