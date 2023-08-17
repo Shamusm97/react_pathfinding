@@ -42,3 +42,21 @@
   min-height: 700px;
   max-height: 700px;
 }
+
+.bottomUI {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.randomnessUI {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  align-items: center;
+}
+
+.slider {
+  max-width: 100px;
+}

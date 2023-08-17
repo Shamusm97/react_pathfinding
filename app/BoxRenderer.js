@@ -1,14 +1,14 @@
-'use client'
-import React, { useState, useEffect } from "react";
+"use client"
+import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import styles from "./page.module.css";
 import Box from "./Box";
 
-function ParentComponent() {
-
+const BoxRenderer = forwardRef((props, ref) => {
   const rows = Math.floor(700 / 25);
   const columns = Math.floor(1200 / 25);
 
   const [boxArray, setBoxArray] = useState([]);
+  const [wallRandomness, setWallRandomness] = useState(30);
 
   // Perform API call to fetch the initial graph data
   useEffect(() => { fetchBlankGraph(); }, []); // Empty dependency array to ensure the effect runs only once
@@ -29,7 +29,6 @@ function ParentComponent() {
 
     fetchGraph();
   };
-
 
   const setBoxState = (boxId, newState) => {
     // Check if there's already a start or end box
@@ -52,28 +51,32 @@ function ParentComponent() {
     setBoxArray(updatedBoxArray);
   };  
   
-  const handleFunction = async () => {
+  const performDijkstra = async () => {
     const response = await fetch("/api/graph", {
-      method: "POST", // Set the HTTP method to POST
-      body: JSON.stringify({boxArray}) // Provide any data you want to send in the body
+      method: "POST",
+      body: JSON.stringify({ boxArray }),
     });
-    
-    let path = await response.json(); // Will be automatically JSON serialized
-    showPath(boxArray, path)
+
+    let path = await response.json();
+    showPath(boxArray, path);
   };
   
   function showPath(boxArray, path) {
     const updatedBoxArray = boxArray.map((box) => {
-      if (path.includes(box.id) && box.state !== "start" && box.state !== "end") {
+      if (box.state === "show_path" && !path.includes(box.id)) {
+        return { ...box, state: "path" };
+      };
+      if (box.state === "start" || box.state === "end") return box; // Skip start and end boxes (don't change their state
+      if (path.includes(box.id)) {
         return { ...box, state: "show_path" };
       }
       return box;
     });
     setBoxArray(updatedBoxArray);
-  }  
+  }
 
-  function generateRandomWalls(totalCount, wallPercentage) {
-    const wallCount = Math.floor((wallPercentage / 100) * totalCount); // Calculate the number of walls based on the percentage
+  function generateRandomWalls(totalCount) {
+    const wallCount = Math.floor((props.wallRandomness / 100) * totalCount); // Calculate the number of walls based on the percentage
     const wallIndices = [];
   
     // Generate random unique indices for walls
@@ -107,23 +110,28 @@ function ParentComponent() {
     return orderedBoxes;
   }  
   
+  const slider = (event, value) => {
+    setWallRandomness(value);
+  };
+
+  useImperativeHandle(ref, () => ({
+    performDijkstra,
+    fetchBlankGraph,
+    generateRandomWalls
+  }));
+
   return (
-    <div>
-      <div className={styles.boxhandler}>
-        {boxArray.map((box) => (
-          <Box
-            key={box.id}
-            id={box.id}
-            state={box.state}
-            setBoxState={setBoxState}
-          />
-        ))}
-      </div>
-      <button onClick={handleFunction}>Dijkstra's Algorithm</button>
-      <button onClick={fetchBlankGraph}>Reset</button>
-      <button onClick={() => generateRandomWalls(rows * columns, 30)}> Generate Random Walls </button>
+    <div className={styles.boxhandler}>
+      {boxArray.map((box) => (
+        <Box
+          key={box.id}
+          id={box.id}
+          state={box.state}
+          setBoxState={setBoxState}
+        />
+      ))}
     </div>
   );
-}
+});
 
-export default ParentComponent;
+export default BoxRenderer;
