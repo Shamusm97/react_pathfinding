@@ -1,40 +1,84 @@
 'use client'
-import React, { useState, useContext } from "react";
+import React, { useState, useEffect } from "react";
 import styles from "./page.module.css";
 import Box from "./Box";
-import { GraphContext, MatchGrapToArrayState } from "./GraphHandler";
-
-export async function GET() {
-  const res = await fetch('localhost:3000/api/graph')
-  const data = await res.json()
- 
-  return NextResponse.json(data)
-}
 
 function ParentComponent() {
-  const { path } = useContext(GraphContext);
 
   const rows = Math.floor(700 / 25);
   const columns = Math.floor(1200 / 25);
 
-  const initialBoxArray = Array.from({ length: rows * columns }, (_, index) => ({
-    id: (rows - 1 - Math.floor(index / columns)) * columns + (index % columns),
-    state: "path" // Initialize each box as "path"
-  }));
+  const [boxArray, setBoxArray] = useState([]);
 
-  const [boxArray, setBoxArray] = useState(initialBoxArray);
+  // Perform API call to fetch the initial graph data
+  useEffect(() => {
+    const fetchGraph = async () => {
+      const response = await fetch("/api/graph");
+      const graph = await response.json();
+      
+      // Initialize boxArray based on the graph data
+      const initialBoxArray = graph.map(node => ({
+        id: node.id, // Use the ID from the graph data
+        state: "path" // Initialize each box as "path"
+      }));
+      
+      setBoxArray(orderBoxes(initialBoxArray, rows, columns));
+    };
+    
+    fetchGraph();
+  }, []); // Empty dependency array to ensure the effect runs only once
 
   const setBoxState = (boxId, newState) => {
+    // Check if there's already a start or end box
+    const hasStart = boxArray.some(box => box.state === "start");
+    const hasEnd = boxArray.some(box => box.state === "end");
+  
+    let updatedState = newState;
+  
+    if (newState === "start" && hasStart) {
+      // Skip adding another start box, go to the next state
+      updatedState = hasEnd ? "path" : "end"; // If there's an end, go to "path", else go to "end"
+    } else if (newState === "end" && hasEnd) {
+      // Skip adding another end box, go to the next state
+      updatedState = "path";
+    }
+  
     const updatedBoxArray = boxArray.map((box) =>
-      box.id === boxId ? { ...box, state: newState } : box
+      box.id === boxId ? { ...box, state: updatedState } : box
     );
     setBoxArray(updatedBoxArray);
+  };  
+  
+  const handleFunction = async () => {
+    const response = await fetch("/api/graph", {
+      method: "POST", // Set the HTTP method to POST
+      body: JSON.stringify({boxArray}) // Provide any data you want to send in the body
+    });
+    
+    let path = await response.json(); // Will be automatically JSON serialized
+    showPath(boxArray, path)
   };
+  
+  function showPath(boxArray, path) {
+    const updatedBoxArray = boxArray.map((box) =>
+      path.includes(box.id) ? { ...box, state: "show_path" } : box
+    );
+    setBoxArray(updatedBoxArray);
+  }
 
-  const handleFunction = () => {
-    GET();
-  };
-
+  function orderBoxes(boxArray, rows, columns) {
+    const orderedBoxes = [];
+    
+    for (let i = rows - 1; i >= 0; i--) {
+      for (let j = 0; j < columns; j++) {
+        const boxIndex = i * columns + j; // Calculate the index for the current box
+        orderedBoxes.push(boxArray[boxIndex]);
+      }
+    }
+    
+    return orderedBoxes;
+  }  
+  
   return (
     <div>
       <div className={styles.boxhandler}>

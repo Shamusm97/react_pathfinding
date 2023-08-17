@@ -1,10 +1,17 @@
-'use client'
+"use client"
+
 import React from "react";
 import styles from "./page.module.css";
 
+const boxStates = ["path", "wall", "start", "end"];
+
 function Box({ id, state, setBoxState }) {
+  const currentStateIndex = boxStates.indexOf(state);
+
   const getBackgroundColor = (state) => {
     switch (state) {
+      case "show_path":
+        return "black";
       case "path":
         return "white";
       case "start":
@@ -14,7 +21,7 @@ function Box({ id, state, setBoxState }) {
       case "wall":
         return "gray";
       default:
-        return "purple"; // Default to white if state is not recognized
+        return "purple"; // Default to purple if state is not recognized
     }
   };
 
@@ -23,27 +30,8 @@ function Box({ id, state, setBoxState }) {
   };
 
   const handleBoxClick = () => {
-    let newState = "";
-
-    switch (state) {
-      case "path":
-        newState = "start";
-        break;
-      case "start":
-        newState = "end";
-        break;
-      case "end":
-        newState = "wall";
-        break;
-      case "wall":
-        newState = "path";
-        break;
-      default:
-        newState = "path";
-        break;
-    }
-
-    setBoxState(id, newState);
+    const nextIndex = (currentStateIndex + 1) % boxStates.length;
+    setBoxState(id, boxStates[nextIndex]);
   };
 
   return <div className={styles.box} style={boxStyles} onClick={handleBoxClick}></div>;

@@ -1,6 +1,6 @@
 import styles from './page.module.css'
 import BoxRenderer from './BoxRenderer'
-import {GraphProvider} from './GraphHandler'
+import {GraphProvider} from './api/graph/GraphHandler'
 
 
 export default function Home() {
@@ -9,9 +9,7 @@ export default function Home() {
       <header className={styles.header}>
         <p className={styles.title}>Hello World!</p>
       </header>
-      <GraphProvider>
         <BoxRenderer />
-      </GraphProvider>
     </main>
   )
 }
