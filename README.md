@@ -1,34 +1,31 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# React Pathfinding Visualizer
 
-## Getting Started
+## Description
+This is a pathfinding visualizer built with React. It allows the user to select a start and end node, and then select walls to block the path. The user can then select a pathfinding algorithm and watch the algorithm find the shortest path between the start and end nodes.
 
-First, run the development server:
+## How to Use
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-```
+### Selecting Nodes
+Nodes rotate between four states: path (the default state), wall, start and end. Clicking on a node causes it to rotate through the available states. Only one start and end node can exist at any one time.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Selecting an Algorithm
+At the moment the only available algorith is Dijkstra's algorithm. More algorithms will be added in the future. Press the Djikstra button to execute the algorithm.
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+### Executing the Algorithm
+Press the Djikstra button to execute the algorithm. The algorithm will then find the shortest path between the start and end nodes. The algorithm will not execute if there is no start or end node, or if there is no path between the start and end nodes.
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+### Clearing the Board
+Press the Reset button to completely reset the board. This will remove all walls and the start and end nodes.
 
-## Learn More
+### Generating random walls
+Press the Generate Random Walls button to generate a random set of walls. This will remove all walls and the start and end nodes. The slider can be used to adjust the density of the walls.
 
-To learn more about Next.js, take a look at the following resources:
+## How to Run
+### Live Version
+1. Clone the repository
+2. Run `npm install` to install the dependencies
+3. Run `npm start` to start the application
+4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+### Deployed Version
+The application is deployed on Heroku and can be accessed [here](https://react-pathfinding-two.vercel.app/).
