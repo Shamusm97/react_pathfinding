@@ -28,6 +28,7 @@
     border: 1px solid #000000;
     background-color: #ffffff;
     color: white;
+    border-radius: 2px;
 }
 
 .boxhandler {
@@ -92,7 +93,7 @@
 .bottomUI {
   display: flex;
   flex-direction: row;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
 }
 
@@ -105,4 +106,5 @@
 
 .slider {
   max-width: 100px;
+  margin: 20px;
 }

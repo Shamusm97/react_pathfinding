@@ -29,6 +29,24 @@ export async function POST(request, response) {
             return NextResponse.json(path, {
                 headers: { 'Content-Type': 'application/json' },
             });
+        } else if (instruction === 'RunAStar') {
+            if (!requestBody || !requestBody.boxArray) {
+                return new Response('Invalid request body', { status: 400 });
+            }
+
+            const boxArray = requestBody.boxArray;
+
+            try {
+                const path = await GraphHandler.RunAStar(boxArray);
+
+                return new Response(JSON.stringify(path), {
+                    headers: { 'Content-Type': 'application/json' },
+                });
+            } catch (error) {
+                // Handle the error appropriately
+                console.error('An error occurred:', error);
+                return new Response('Error occurred', { status: 500 });
+            }
         }
     } catch (error) {
         console.error('Error handling request:', error);

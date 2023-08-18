@@ -44,25 +44,18 @@ const Header = () => {
   );
 };
 
-const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, generateRandomWalls, dimensions }) => {
+const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, generateRandomWalls, dimensions, performAStar }) => {
     return (
       <div className={styles.bottomUI}>
-        <Button variant="contained" onClick={performDijkstra}>
-          Dijkstra's Algorithm
-        </Button>
-        <Button variant="contained" onClick={fetchBlankGraph}>
-          Reset
-        </Button>
+        <Button variant="contained" onClick={performDijkstra}> Dijkstra's Algorithm </Button>
+        <Button variant="contained" onClick={fetchBlankGraph}> Reset </Button>
+        <Button variant="contained" onClick={() => performAStar()}> A Star Alogrithm </Button>
         <div className={styles.randomnessUI}>
-          <Button variant="contained" onClick={() => generateRandomWalls(dimensions.rows * dimensions.columns)}>
-            Generate Random Walls
-          </Button>
-          <p>Wall Randomness</p>
-          <p>{wallRandomness}</p>
+          <Button variant="contained" onClick={() => generateRandomWalls(dimensions.rows * dimensions.columns)}> Generate Random Walls </Button>
           <Slider
             className={styles.slider}
             min={0}
-            max={100}
+            max={30}
             aria-label="Wall Randomness"
             value={wallRandomness}
             onChange={slider}
@@ -100,6 +93,12 @@ const UIRenderer = () => {
         }
     };
 
+    const performAStar = (start, end) => {
+        if (boxRendererRef.current) {
+            boxRendererRef.current.performAStar(start, end);
+        }
+    };
+
     const slider = (event, newValue) => {
         setWallRandomness(newValue);
     };
@@ -121,7 +120,8 @@ const UIRenderer = () => {
             wallRandomness={wallRandomness} 
             performDijkstra={performDijkstra} 
             fetchBlankGraph={fetchBlankGraph} 
-            generateRandomWalls={generateRandomWalls} />
+            generateRandomWalls={generateRandomWalls}
+            performAStar={performAStar} />
         </div>
     );
 };

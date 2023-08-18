@@ -29,7 +29,6 @@ const BoxRenderer = forwardRef((props, ref) => {
         }
         
         const graph = await response.json();
-        console.log(graph);
   
         // Initialize boxArray based on the graph data
         const initialBoxArray = graph.map(node => ({
@@ -38,7 +37,6 @@ const BoxRenderer = forwardRef((props, ref) => {
         }));
   
         setBoxArray(orderBoxes(initialBoxArray, props.dimensions.rows, props.dimensions.columns));
-        console.log(boxArray);
       } catch (error) {
         console.error('Error fetching graph:', error);
       }
@@ -89,14 +87,36 @@ const BoxRenderer = forwardRef((props, ref) => {
         throw new Error("Invalid path data received from the server");
       }
   
-      showPath(boxArray, path);
+      animatePath(path);
     } catch (error) {
       console.error("Error performing Dijkstra:", error);
       // Handle or display the error as needed
     }
   };
   
-  
+  const performAStar = async () => {
+    try {
+      const response = await fetch("/api/graph", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Instruction": "RunAStar"
+        },
+        body: JSON.stringify({ boxArray: boxArray }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Failed to run A Star. Status: ${response.status}`);
+      }
+
+      const path = await response.json();
+      animatePath(path);
+    } catch (error) {
+      console.error("Error running A Star:", error);
+      // Handle or display the error as needed
+    }
+  };
+
   function showPath(boxArray, path) {
     const updatedBoxArray = boxArray.map((box) => {
       if (box.state === "show_path" && !path.includes(box.id)) {
@@ -110,6 +130,14 @@ const BoxRenderer = forwardRef((props, ref) => {
     });
     setBoxArray(updatedBoxArray);
   }
+
+  function animatePath(path) {
+    for (let i = 0; i < path.length; i++) {
+      setTimeout(() => {
+        showPath(boxArray, path.slice(0, i + 1));
+      }, 50 * i);
+    }
+  }  
 
   function generateRandomWalls(totalCount) {
     const wallCount = Math.floor((props.wallRandomness / 100) * totalCount); // Calculate the number of walls based on the percentage
@@ -141,14 +169,14 @@ const BoxRenderer = forwardRef((props, ref) => {
         orderedBoxes.push(boxArray[boxIndex]);
       }
     }
-    console.log(orderedBoxes);
     return orderedBoxes;
   }  
 
   useImperativeHandle(ref, () => ({
     performDijkstra,
     fetchBlankGraph,
-    generateRandomWalls
+    generateRandomWalls,
+    performAStar
   }));
 
   return (
