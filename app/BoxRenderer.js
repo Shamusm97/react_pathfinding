@@ -131,7 +131,6 @@ const BoxRenderer = forwardRef((props, ref) => {
   
     setBoxArray(objectsWithWalls);
   }
-  
 
   function orderBoxes(boxArray) {
     const orderedBoxes = [];
@@ -145,10 +144,6 @@ const BoxRenderer = forwardRef((props, ref) => {
     console.log(orderedBoxes);
     return orderedBoxes;
   }  
-  
-  const slider = (event, value) => {
-    setWallRandomness(value);
-  };
 
   useImperativeHandle(ref, () => ({
     performDijkstra,

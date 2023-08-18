@@ -33,7 +33,7 @@ const calculateDimensions = () => {
     const columns = Math.floor(screenWidth / boxSize);
     console.log('Screen Size: ', screenWidth, screenHeight)
     console.log(`Rows: ${rows}, Columns: ${columns}, Box Size: ${boxSize}`);
-    return { rows, columns };
+    return { rows, columns, boxSize };
 };
 
 const Header = () => {
@@ -78,7 +78,8 @@ const UIRenderer = () => {
     const [dimensions, setDimensions] = useState(null);
 
     useEffect(() => {
-      setDimensions(calculateDimensions());
+      const calculatedDimensions = calculateDimensions();
+      setDimensions(calculatedDimensions);
     }, []);
 
     const performDijkstra = () => {
