@@ -1,9 +1,40 @@
 "use client"
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import styles from './page.module.css';
 import Button from '@mui/material/Button';
 import Slider from '@mui/material/Slider';
 import BoxRenderer from './BoxRenderer';
+
+// calculate the number of rows and columns based on the screen size
+// this is a bit of a hack, but it works for now
+// TODO: make this more robust
+const calculateDimensions = () => {
+    let boxSize = 0;
+    let screenWidth = window.innerWidth;
+    let screenHeight = window.innerHeight;
+
+    if (screenWidth > 1200) {
+        boxSize = 25;
+        screenWidth = 1200;
+        screenHeight = 700;
+    } else if (screenWidth > 900) {
+        boxSize = 20;
+        screenWidth = 900;
+        screenHeight = 700;
+    } else if (screenWidth > 600) {
+        boxSize = 15;
+        screenWidth = 600;
+        screenHeight = 700;
+    } else {
+        boxSize = 10;
+    }
+
+    const rows = Math.floor(screenHeight / boxSize);
+    const columns = Math.floor(screenWidth / boxSize);
+    console.log('Screen Size: ', screenWidth, screenHeight)
+    console.log(`Rows: ${rows}, Columns: ${columns}, Box Size: ${boxSize}`);
+    return { rows, columns };
+};
 
 const Header = () => {
   return (
@@ -13,7 +44,7 @@ const Header = () => {
   );
 };
 
-const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, generateRandomWalls }) => {
+const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, generateRandomWalls, dimensions }) => {
     return (
       <div className={styles.bottomUI}>
         <Button variant="contained" onClick={performDijkstra}>
@@ -23,7 +54,7 @@ const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, gene
           Reset
         </Button>
         <div className={styles.randomnessUI}>
-          <Button variant="contained" onClick={() => generateRandomWalls(700/25 * 1200/25)}>
+          <Button variant="contained" onClick={() => generateRandomWalls(dimensions.rows * dimensions.columns)}>
             Generate Random Walls
           </Button>
           <p>Wall Randomness</p>
@@ -44,6 +75,11 @@ const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, gene
 const UIRenderer = () => {
     const boxRendererRef = useRef(null);
     const [wallRandomness, setWallRandomness] = useState(30);
+    const [dimensions, setDimensions] = useState(null);
+
+    useEffect(() => {
+      setDimensions(calculateDimensions());
+    }, []);
 
     const performDijkstra = () => {
         if (boxRendererRef.current) {
@@ -67,11 +103,19 @@ const UIRenderer = () => {
         setWallRandomness(newValue);
     };
 
+    if (!dimensions) {
+        return null; // Render nothing until dimensions are calculated
+    }
+
     return (
         <div>
             <Header />
-            <BoxRenderer ref={boxRendererRef} wallRandomness={wallRandomness} />
-            <Footer 
+            <BoxRenderer
+            ref={boxRendererRef} 
+            wallRandomness={wallRandomness}
+            dimensions={dimensions} />
+            <Footer
+            dimensions={dimensions}
             slider={slider}
             wallRandomness={wallRandomness} 
             performDijkstra={performDijkstra} 

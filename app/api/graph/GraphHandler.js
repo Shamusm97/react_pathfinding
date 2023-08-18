@@ -1,8 +1,5 @@
-const boxSize = 25;
-const boxHandlerHeight = 700;
-const boxHandlerWidth = 1200;
-const rows = Math.floor(boxHandlerHeight / boxSize);
-const columns = Math.floor(boxHandlerWidth / boxSize);
+let rows = 0;
+let columns = 0;
 
 class Node {
     constructor(id, value) {
@@ -30,13 +27,15 @@ class Node {
     }
 }
 
-export function InitializeBlankGraph(rows, columns) {
-const nodeGraph = [];
-for( let i=0; i < rows; i++ ) {
-    for( let j=0; j < columns; j++ ) {
-        const node = new Node( i * columns + j, null );
-        nodeGraph.push(node);
-    }
+export function InitializeBlankGraph(calculatedRows, calculatedColumns) {
+    rows = calculatedRows;
+    columns = calculatedColumns;
+    const nodeGraph = [];
+    for( let i=0; i < rows; i++ ) {
+        for( let j=0; j < columns; j++ ) {
+            const node = new Node( i * columns + j, null );
+            nodeGraph.push(node);
+        }
 }
 
 return nodeGraph;
@@ -44,9 +43,9 @@ return nodeGraph;
 
 export function InitializeGraphFromBoxArray(boxArray) {
     const nodeGraph = [];
-    for( let i=0; i < boxArray.boxArray.length; i++ ) {
-        const node = new Node( boxArray.boxArray[i].id, null );
-        node.state = boxArray.boxArray[i].state;
+    for( let i=0; i < boxArray.length; i++ ) {
+        const node = new Node( boxArray[i].id, null );
+        node.state = boxArray[i].state;
         nodeGraph.push(node);
     }
     return nodeGraph;
@@ -118,7 +117,8 @@ export function Dijkstra(nodeGraph, start, end){
     return path;
 }
 
-export function RunDijkstra(boxArray, rows, columns) {
+export function RunDijkstra(boxArray) {
+    console.log(boxArray);
     const nodeGraph = InitializeGraphFromBoxArray(boxArray);
     InitializeGraphLinkWeights(nodeGraph, rows, columns);
     const start = nodeGraph.find(node => node.state === "start");

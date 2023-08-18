@@ -4,31 +4,48 @@ import styles from "./page.module.css";
 import Box from "./Box";
 
 const BoxRenderer = forwardRef((props, ref) => {
-  const rows = Math.floor(700 / 25);
-  const columns = Math.floor(1200 / 25);
 
   const [boxArray, setBoxArray] = useState([]);
-  const [wallRandomness, setWallRandomness] = useState(30);
 
   // Perform API call to fetch the initial graph data
   useEffect(() => { fetchBlankGraph(); }, []); // Empty dependency array to ensure the effect runs only once
 
   function fetchBlankGraph() {
     const fetchGraph = async () => {
-      const response = await fetch("/api/graph");
-      const graph = await response.json();
-      
-      // Initialize boxArray based on the graph data
-      const initialBoxArray = graph.map(node => ({
-        id: node.id, // Use the ID from the graph data
-        state: "path" // Initialize each box as "path"
-      }));
-      
-      setBoxArray(orderBoxes(initialBoxArray, rows, columns));
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Instruction': 'InitializeBlankGraph'
+        },
+        body: JSON.stringify({ dimension: props.dimensions }),
+      };
+  
+      try {
+        const response = await fetch("/api/graph", requestOptions);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to initialize blank graph. Status: ${response.status}`);
+        }
+        
+        const graph = await response.json();
+        console.log(graph);
+  
+        // Initialize boxArray based on the graph data
+        const initialBoxArray = graph.map(node => ({
+          id: node.id, // Use the ID from the graph data
+          state: "path" // Initialize each box as "path"
+        }));
+  
+        setBoxArray(orderBoxes(initialBoxArray, props.dimensions.rows, props.dimensions.columns));
+        console.log(boxArray);
+      } catch (error) {
+        console.error('Error fetching graph:', error);
+      }
     };
-
+  
     fetchGraph();
-  };
+  }  
 
   const setBoxState = (boxId, newState) => {
     // Check if there's already a start or end box
@@ -52,14 +69,33 @@ const BoxRenderer = forwardRef((props, ref) => {
   };  
   
   const performDijkstra = async () => {
-    const response = await fetch("/api/graph", {
-      method: "POST",
-      body: JSON.stringify({ boxArray }),
-    });
-
-    let path = await response.json();
-    showPath(boxArray, path);
+    try {
+      const response = await fetch("/api/graph", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Instruction": "RunDijkstra"
+        },
+        body: JSON.stringify({ boxArray }),
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch path data. Status: ${response.status}`);
+      }
+  
+      const path = await response.json();
+  
+      if (!Array.isArray(path)) {
+        throw new Error("Invalid path data received from the server");
+      }
+  
+      showPath(boxArray, path);
+    } catch (error) {
+      console.error("Error performing Dijkstra:", error);
+      // Handle or display the error as needed
+    }
   };
+  
   
   function showPath(boxArray, path) {
     const updatedBoxArray = boxArray.map((box) => {
@@ -97,16 +133,16 @@ const BoxRenderer = forwardRef((props, ref) => {
   }
   
 
-  function orderBoxes(boxArray, rows, columns) {
+  function orderBoxes(boxArray) {
     const orderedBoxes = [];
     
-    for (let i = rows - 1; i >= 0; i--) {
-      for (let j = 0; j < columns; j++) {
-        const boxIndex = i * columns + j; // Calculate the index for the current box
+    for (let i = props.dimensions.rows - 1; i >= 0; i--) {
+      for (let j = 0; j < props.dimensions.columns; j++) {
+        const boxIndex = i * props.dimensions.columns + j; // Calculate the index for the current box
         orderedBoxes.push(boxArray[boxIndex]);
       }
     }
-    
+    console.log(orderedBoxes);
     return orderedBoxes;
   }  
   

@@ -36,11 +36,11 @@
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
-  justify-content: center;
   min-width: 1200px;
   max-width: 1200px;
   min-height: 700px;
   max-height: 700px;
+  margin: 0 auto;
 }
 
 .bottomUI {
