@@ -10,7 +10,9 @@ import UIRenderer from './UIRenderer';
 export default function Home() {
   return (
     <main className={styles.main}>
-      <APIProvider />
+      <APIProvider>
+      <UIRenderer />
+      </APIProvider>
     </main>
   )
 }

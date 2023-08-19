@@ -1,10 +1,9 @@
 "use client"
 import React, { createContext, useState, useEffect } from 'react';
-import UIRenderer from './UIRenderer';
 
 const APIContext = createContext();
 
-const calculateDimensions = () => {
+const calculateDimensions = async () => {
     let boxSize, screenWidth, numRows, numColumns;
     const windowWidth = window.innerWidth;
     const windowHeight = window.innerHeight;
@@ -30,38 +29,50 @@ const calculateDimensions = () => {
     numRows = Math.floor(windowHeight / boxSize);
     numColumns = Math.floor(screenWidth / boxSize);
 
-    return { numRows, numColumns };
+    return { rows: numRows, columns: numColumns };
 };
 
 function APIProvider({ children }) {
     // Ideally this would be linked to the actual logic handler, but that would make it refresh everytime the dimensions change
     // Too much to handle right now
     const [dimensions, setDimensions] = useState(null);
-    const [boxArray, setBoxArray] = useState([]);
+    const [boxGraph, setBoxGraph] = useState([]);
 
     useEffect(() => {
-    const { rows, cols } = calculateDimensions();
-    setDimensions({ rows, cols });
-    initializeGraphs({ rows, cols });
+        async function fetchDimensions() {
+            const { rows, columns } = await calculateDimensions();
+            console.log("Dimensions calculated to ", rows, columns);
+            setDimensions({ rows, columns });
+        }
+        fetchDimensions();
     }, []);
 
-    function initializeGraphs() {
-        //API POST request
+    useEffect(() => {
+        if (dimensions !== null) {
+            initializeGraphs(dimensions);
+        }
+    }, [dimensions]);
+
+    async function initializeGraphs() {
+        console.log("Initializing graphs");
         const requestOptions = {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json',
-                'Instruction': 'initializeGraphs'
+              'Content-Type': 'application/json',
+              'Instruction': 'initializeGraphs'
             },
-            body: dimensions
+            body: JSON.stringify({ dimensions: dimensions }),
         };
 
-        fetch('/api/routes', requestOptions)
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-                setBoxArray(data);
-            });
+        try {
+            const response = await fetch('/api', requestOptions);
+            const boxGraph = await response.json();
+            console.log("BoxGraph: ", boxGraph);
+            setBoxGraph(boxGraph);
+            return boxGraph;
+        } catch (error) {
+            console.log("Error: ", error);
+        }
     }
 
     function performDijkstra(boxArray) {

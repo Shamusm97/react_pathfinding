@@ -1,50 +1,25 @@
 "use client"
-import React, { useState, useEffect, forwardRef, useImperativeHandle } from "react";
+import React, { useState, useEffect, forwardRef, useImperativeHandle, useContext } from "react";
 import styles from "./page.module.css";
 import Box from "./Box";
+import { APIContext } from './APIHandler';
 
 const BoxRenderer = forwardRef((props, ref) => {
+
+  const { dimensions, boxGraph } = useContext(APIContext);
 
   const [boxArray, setBoxArray] = useState([]);
   const [stepCount, setStepCount] = useState(0);
 
-  // Perform API call to fetch the initial graph data
-  useEffect(() => { fetchBlankGraph(); }, []); // Empty dependency array to ensure the effect runs only once
+  useEffect(() => {
+      fetchBlankGraph();
+      console.log("test", boxGraph)
+  }, [boxGraph]);
 
   function fetchBlankGraph() {
-    const fetchGraph = async () => {
-      const requestOptions = {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Instruction': 'InitializeBlankGraph'
-        },
-        body: JSON.stringify({ dimension: props.dimensions }),
-      };
-  
-      try {
-        const response = await fetch("/api/graph", requestOptions);
-        
-        if (!response.ok) {
-          throw new Error(`Failed to initialize blank graph. Status: ${response.status}`);
-        }
-        
-        const graph = await response.json();
-  
-        // Initialize boxArray based on the graph data
-        const initialBoxArray = graph.map(node => ({
-          id: node.id, // Use the ID from the graph data
-          state: "path" // Initialize each box as "path"
-        }));
-  
-        setBoxArray(orderBoxes(initialBoxArray, props.dimensions.rows, props.dimensions.columns));
-      } catch (error) {
-        console.error('Error fetching graph:', error);
-      }
-    };
-  
-    fetchGraph();
-  }  
+    console.log("Fetching blank graph");
+    console.log("Array: ", boxGraph);
+  };
 
   const setBoxState = (boxId, newState) => {
     // Check if there's already a start or end box

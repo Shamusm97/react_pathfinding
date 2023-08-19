@@ -36,6 +36,7 @@ const UIRenderer = () => {
         return (
             <div>
                 <Header />
+                <BoxRenderer />
                 <Footer/>
             </div>
         );

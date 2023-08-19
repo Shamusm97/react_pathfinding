@@ -5,34 +5,36 @@ class Box {
   }
 }
 
-class BoxArray {
+class BoxGraph {
   constructor(dimensions) {
     this.dimensions = dimensions;
-    this.boxArray = this.generateBlankBoxArray();
+    this.boxGraph = this.generateBlankBoxGraph();
   }
 
-  generateBlankBoxArray = () => {
-    const boxArray = [];
+  generateBlankBoxGraph = () => {
+    const boxGraph = [];
     for (let i = 0; i < this.dimensions.rows; i++) {
       for (let j = 0; j < this.dimensions.columns; j++) {
-        boxArray.push({
+        boxGraph.push({
           id: i * this.dimensions.columns + j,
           state: "open"
         });
       }
     }
-    return boxArray;
-  };
-
-  getBoxArray = () => {
-    return this.boxArray;
+    return boxGraph;
   };
 
   setBoxState = (index, state) => {
-    this.boxArray[index].state = state;
+    this.boxGraph[index].state = state;
   };
 
   getBoxState = (index) => {
-    return this.boxArray[index].state;
+    return this.boxGraph[index].state;
   };
 }
+
+async function initializeBoxGraph(dimensions) {
+  return new BoxGraph(dimensions);
+}
+
+export { initializeBoxGraph };
