@@ -47,6 +47,12 @@ export async function POST(request, response) {
                 console.error('An error occurred:', error);
                 return new Response('Error occurred', { status: 500 });
             }
+        } else if (instruction == "GenerateMaze") {
+            const maze = GraphHandler.GenerateMaze();
+            console.log(response);
+            return NextResponse.json(maze, {
+                headers: { 'Content-Type': 'application/json' },
+            });
         }
     } catch (error) {
         console.error('Error handling request:', error);

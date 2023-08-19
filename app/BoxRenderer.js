@@ -162,6 +162,40 @@ const BoxRenderer = forwardRef((props, ref) => {
     setBoxArray(objectsWithWalls);
   }
 
+  function generateMaze() {
+    const fetchMaze = async () => {
+      const requestOptions = {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Instruction': 'GenerateMaze'
+        }
+      };
+  
+      try {
+        const response = await fetch("/api/graph", requestOptions);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to generate maze. Status: ${response.status}`);
+        }
+        
+        const maze = await response.json();
+  
+        // Initialize boxArray based on the graph data
+        const initialBoxArray = maze.map(node => ({
+          id: node.id, // Use the ID from the graph data
+          state: "path" // Initialize each box as "path"
+        }));
+  
+        setBoxArray(initialBoxArray);
+      } catch (error) {
+        console.error('Error fetching graph:', error);
+      }
+    };
+  
+    fetchMaze();
+  }
+
   function orderBoxes(boxArray) {
     const orderedBoxes = [];
     
@@ -179,7 +213,8 @@ const BoxRenderer = forwardRef((props, ref) => {
     fetchBlankGraph,
     generateRandomWalls,
     performAStar,
-    stepCount
+    stepCount,
+    generateMaze
   }));
 
   return (

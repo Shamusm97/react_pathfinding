@@ -268,3 +268,38 @@ export async function RunAStar(boxArray) {
     const path = astar(nodeGraph, start, end);
     return path
 }
+
+function Prim(nodeGraph) {
+    const newGraph = nodeGraph.map(node => ({ ...node, visited: false }));
+    const start = newGraph[0];
+    const walls = [];
+    const wallsSet = new Set();
+    
+    start.visited = true;
+    walls.push(...start.links);
+
+    while (walls.length > 0) {
+        const randomIndex = Math.floor(Math.random() * walls.length);
+        const randomWall = walls[randomIndex];
+        walls.splice(randomIndex, 1);
+
+        const targetNode = randomWall.target;
+
+        if (!targetNode.visited) {
+            targetNode.visited = true;
+            randomWall.state = "path";
+            walls.push(...targetNode.links.filter(link => !link.target.visited));
+        } else {
+            randomWall.state = "path";
+        }
+    }
+}
+
+
+export function GenerateMaze() {
+    console.log(rows, columns);
+    const nodeGraph = InitializeBlankGraph(rows, columns);
+    InitializeGraphLinkWeights(nodeGraph, rows, columns);
+    const maze = Prim(nodeGraph);
+    return maze;
+}
