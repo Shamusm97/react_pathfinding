@@ -6,6 +6,7 @@ import Box from "./Box";
 const BoxRenderer = forwardRef((props, ref) => {
 
   const [boxArray, setBoxArray] = useState([]);
+  const [stepCount, setStepCount] = useState(0);
 
   // Perform API call to fetch the initial graph data
   useEffect(() => { fetchBlankGraph(); }, []); // Empty dependency array to ensure the effect runs only once
@@ -134,6 +135,7 @@ const BoxRenderer = forwardRef((props, ref) => {
   function animatePath(path) {
     for (let i = 0; i < path.length; i++) {
       setTimeout(() => {
+        setStepCount(i + 1);
         showPath(boxArray, path.slice(0, i + 1));
       }, 50 * i);
     }
@@ -176,7 +178,8 @@ const BoxRenderer = forwardRef((props, ref) => {
     performDijkstra,
     fetchBlankGraph,
     generateRandomWalls,
-    performAStar
+    performAStar,
+    stepCount
   }));
 
   return (

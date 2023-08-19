@@ -28,4 +28,4 @@ Press the Generate Random Walls button to generate a random set of walls. This w
 4. Open [http://localhost:3000](http://localhost:3000) to view it in the browser.
 
 ### Deployed Version
-The application is deployed on Heroku and can be accessed [here](https://react-pathfinding-two.vercel.app/).
+The application is deployed on Vercel and can be accessed [here](https://react-pathfinding-two.vercel.app/).

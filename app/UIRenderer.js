@@ -44,12 +44,13 @@ const Header = () => {
   );
 };
 
-const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, generateRandomWalls, dimensions, performAStar }) => {
+const Footer = ({ wallRandomness, slider, performDijkstra, fetchBlankGraph, generateRandomWalls, dimensions, performAStar, stepCount }) => {
     return (
       <div className={styles.bottomUI}>
         <Button variant="contained" onClick={performDijkstra}> Dijkstra's Algorithm </Button>
         <Button variant="contained" onClick={fetchBlankGraph}> Reset </Button>
         <Button variant="contained" onClick={() => performAStar()}> A Star Alogrithm </Button>
+        <p>steps: {stepCount}</p>
         <div className={styles.randomnessUI}>
           <Button variant="contained" onClick={() => generateRandomWalls(dimensions.rows * dimensions.columns)}> Generate Random Walls </Button>
           <Slider
@@ -99,6 +100,12 @@ const UIRenderer = () => {
         }
     };
 
+    const stepCount = () => {
+        if (boxRendererRef.current) {
+            return boxRendererRef.current.stepCount();
+        }
+    };
+
     const slider = (event, newValue) => {
         setWallRandomness(newValue);
     };
@@ -121,7 +128,8 @@ const UIRenderer = () => {
             performDijkstra={performDijkstra} 
             fetchBlankGraph={fetchBlankGraph} 
             generateRandomWalls={generateRandomWalls}
-            performAStar={performAStar} />
+            performAStar={performAStar}
+            stepCount={stepCount} />
         </div>
     );
 };
