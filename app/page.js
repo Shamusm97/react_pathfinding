@@ -4,13 +4,15 @@ import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 
 import styles from './page.module.css'
-import BoxRenderer from './BoxRenderer'
+import { APIProvider } from './APIHandler';
 import UIRenderer from './UIRenderer';
 
 export default function Home() {
   return (
     <main className={styles.main}>
+      <APIProvider>
       <UIRenderer />
+      </APIProvider>
     </main>
   )
 }

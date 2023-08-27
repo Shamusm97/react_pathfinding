@@ -1,18 +1,15 @@
-"use client"
-
-import React from "react";
+import React, {useState, useEffect, useContext} from "react";
 import styles from "./page.module.css";
+import { APIContext } from "./APIHandler";
 
-const boxStates = ["path", "wall", "start", "end"];
-
-function Box({ id, state, setBoxState }) {
-  const currentStateIndex = boxStates.indexOf(state);
+function Box({ id, state, onClick }) {
+  const { dimensions } = useContext(APIContext);
 
   const getBackgroundColor = (state) => {
     switch (state) {
-      case "show_path":
-        return "black";
       case "path":
+        return "black";
+      case "open":
         return "white";
       case "start":
         return "green";
@@ -26,15 +23,12 @@ function Box({ id, state, setBoxState }) {
   };
 
   const boxStyles = {
-    backgroundColor: getBackgroundColor(state)
+    backgroundColor: getBackgroundColor(state),
+    width: dimensions ? dimensions.boxSize : 0,
+    height: dimensions ? dimensions.boxSize : 0,
   };
 
-  const handleBoxClick = () => {
-    const nextIndex = (currentStateIndex + 1) % boxStates.length;
-    setBoxState(id, boxStates[nextIndex]);
-  };
-
-  return <div className={styles.box} style={boxStyles} onClick={handleBoxClick}></div>;
+  return <div className={styles.box} style={boxStyles} onClick={() => onClick(id)}></div>;
 }
 
 export default Box;
