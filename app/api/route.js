@@ -1,6 +1,4 @@
-import { NextResponse } from 'next/server';
 import * as NodeGraphHandler from './NodeGraphHandler';
-import * as BoxGraphHandler from './BoxGraphHandler';
 
 export async function POST(req, res) {
   try {
@@ -8,12 +6,18 @@ export async function POST(req, res) {
     const instruction = req.headers.get("Instruction");
 
     switch (instruction) {
-      case "initializeGraphs":
-        const data = await BoxGraphHandler.initializeBoxGraph(body.dimensions);
-        const response = new Response(JSON.stringify(data), {
+      case "runDijkstra":
+        const djikstraData = await NodeGraphHandler.runDijkstraOnNodegraph(body.boxGraph);
+        const djikstraResponse = new Response(JSON.stringify(djikstraData), {
           headers: { "Content-Type": "application/json" },
         });
-        return response;
+        return djikstraResponse;
+      case "runAStar":
+        const aStarData = await NodeGraphHandler.runAStarOnNodegraph(body.boxGraph);
+        const aStarResponse = new Response(JSON.stringify(aStarData), {
+          headers: { "Content-Type": "application/json" },
+        });
+        return aStarResponse;
       default:
         return new Response({error: "Invalid instruction", status: 400 });
     }

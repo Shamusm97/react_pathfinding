@@ -8,8 +8,8 @@
 
 .header {
     background-color: #1d1e20;
-    min-height: 100px; /* Set your desired minimum height */
-    max-height: 150px; /* Set your desired maximum height */    display: flex;
+    height: 30px;
+    display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
@@ -18,8 +18,8 @@
 }
 
 .title {
-    font-size: 2rem;
-    margin-bottom: 1rem;
+    font-size: 1rem;
+    justify-content: center;
 }
 
 .box {
@@ -31,80 +31,44 @@
     border-radius: 2px;
 }
 
-.boxhandler {
+.boxRenderer {
   display: flex;
   flex-direction: row;
   flex-wrap: wrap;
   margin: 0 auto;
 }
 
-@media (min-width: 1200px) {
-  .boxhandler {
-    /* Styles for larger screens */
-    width: 1200px;
-    height: 700px;
-    font-size: 25px;
-  }
-  .box {
-    width: 25px;
-    height: 25px;
-  }
-}
-
-@media (min-width: 901px) and (max-width: 1200px) {
-  .boxhandler {
-    /* Styles for medium-sized screens */
-    width: 900px;
-    height: 700px;
-    font-size: 20px;
-  }
-  .box {
-    width: 20px;
-    height: 20px;
-  }
-}
-
-@media (min-width: 601px) and (max-width: 900px) {
-  .boxhandler {
-    /* Styles for smaller screens */
-    width: 600px;
-    height: 700px;
-    font-size: 15px;
-  }
-  .box {
-    width: 15px;
-    height: 15px;
-  }
-}
-
-@media (max-width: 600px) {
-  .boxhandler {
-    /* Styles for the smallest screens */
-    width: 100%; /* Full width */
-    height: 700px;
-    font-size: 10px;
-  }
-  .box {
-    width: 10px;
-    height: 10px;
-  }
-}
-
-.bottomUI {
+.footer {
   display: flex;
   flex-direction: row;
-  justify-content: space-between;
+  justify-content: space-around;
   align-items: center;
 }
 
-.randomnessUI {
+.resetButton {
+  margin: 10px;
+}
+
+.pathfindingButtons {
   display: flex;
   flex-direction: row;
-  justify-content: center;
   align-items: center;
+}
+
+.pathfindingButtons button {
+  margin: 5px;
+}
+
+.wallUI {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.wallUI button {
+  margin: 5px;
 }
 
 .slider {
-  max-width: 100px;
-  margin: 20px;
+  margin-left: 5px;
 }

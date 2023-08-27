@@ -51,27 +51,12 @@ class NodeGraph {
     }
 }
 
-function initializeNodeGraph(dimensions) {
-    rows = dimensions.rows;
-    columns = dimensions.columns;
-    initializeBlankNodeGraph(rows, columns);
-}
-
-function initializeBlankNodeGraph(rows, columns) {
-    const nodeGraph = new NodeGraph();
-    for (let i = 0; i < rows; i++) {
-        for (let j = 0; j < columns; j++) {
-            const node = new Node(i * columns + j, null);
-            nodeGraph.addNode(node);
-        }
-    }
-    return nodeGraph;
-}
-
 function initializeNodeGraphFromBoxGraph(boxGraph) {
     const nodeGraph = new NodeGraph();
-    for (let i = 0; i < boxGraph.length; i++) {
-        const box = boxGraph[i];
+    nodeGraph.dimensions.rows = boxGraph.dimensions.rows;
+    nodeGraph.dimensions.columns = boxGraph.dimensions.columns;
+    for (let i = 0; i < boxGraph.boxGraph.length; i++) {
+        const box = boxGraph.boxGraph[i];
         const node = new Node(box.id, null);
         node.state = box.state;
         nodeGraph.addNode(node);
@@ -109,11 +94,11 @@ function initializeNodeGraphLinks(nodeGraph) {
     }
 }
 
+
 function dijkstra(nodeGraph) {
-    nodeGraph.validate();
     const start = nodeGraph.start;
     const end = nodeGraph.end;
-    for (const node of nodeGraph) {
+    for (const node of nodeGraph.nodes) {
         if (node === start) {
             node.value = 0;
         } else {
@@ -148,12 +133,15 @@ function dijkstra(nodeGraph) {
     return path;
 }
 
-function runDijkstra(boxGraph) {
+async function runDijkstraOnNodegraph(boxGraph) {
     const nodeGraph = initializeNodeGraphFromBoxGraph(boxGraph);
     initializeNodeGraphLinks(nodeGraph);
+    nodeGraph.validate();
     const path = dijkstra(nodeGraph);
-    return path
+    const filteredPath = path.slice(1, -1);
+    return filteredPath
 }
+
 
 function getRowColFromID(nodeGraph, id) {
     const row = Math.floor(id / nodeGraph.dimensions.columns);
@@ -161,11 +149,9 @@ function getRowColFromID(nodeGraph, id) {
     return { row, col };
 }
 
-function euclideanDistance(nodeGraph) {
-    const start = nodeGraph.start;
-    const end = nodeGraph.end;
-    const node1Pos = getRowColFromID(start.id);
-    const node2Pos = getRowColFromID(end.id);
+function euclideanDistance(nodeGraph, start, end) {
+    const node1Pos = getRowColFromID(nodeGraph, start.id);
+    const node2Pos = getRowColFromID(nodeGraph, end.id);
     const rowDiff = node1Pos.row - node2Pos.row;
     const colDiff = node1Pos.col - node2Pos.col;
     const distance = Math.sqrt(rowDiff * rowDiff + colDiff * colDiff);
@@ -173,7 +159,6 @@ function euclideanDistance(nodeGraph) {
 }
 
 function aStar(nodeGraph) {
-    nodeGraph.validate();
     const start = nodeGraph.start;
     const end = nodeGraph.end;
 
@@ -181,7 +166,7 @@ function aStar(nodeGraph) {
     const closedSet = new Set();
 
     start.cost = 0;
-    start.estimate = euclideanDistance(start, end);
+    start.estimate = euclideanDistance(nodeGraph, start, end);
 
     while (openList.length > 0) {
         openList.sort((a, b) => {
@@ -214,7 +199,7 @@ function aStar(nodeGraph) {
             if (!openList.includes(neighbor) || tentativeCost < neighbor.cost) {
                 neighbor.previousNode = currentNode;
                 neighbor.cost = tentativeCost;
-                neighbor.estimate = euclideanDistance(neighbor, end);
+                neighbor.estimate = euclideanDistance(nodeGraph, neighbor, end);
 
                 if (!openList.includes(neighbor)) {
                     openList.push(neighbor);
@@ -227,11 +212,13 @@ function aStar(nodeGraph) {
     return null;
 }
 
-function RunAStar(boxGraph) {
+async function runAStarOnNodegraph(boxGraph) {
     const nodeGraph = initializeNodeGraphFromBoxGraph(boxGraph);
     initializeNodeGraphLinks(nodeGraph);
+    nodeGraph.validate();
     const path = aStar(nodeGraph);
-    return path
+    const filteredPath = path.slice(1, -1);
+    return filteredPath
 }
 
-export { initializeNodeGraph, initializeNodeGraphFromBoxGraph, runDijkstra, RunAStar };
+export { runDijkstraOnNodegraph, runAStarOnNodegraph };
